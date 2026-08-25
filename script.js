@@ -55,6 +55,8 @@ const elements = {
   playerLabel: document.querySelector("#playerLabel"),
   timerText: document.querySelector("#timerText"),
   wordsText: document.querySelector("#wordsText"),
+  charactersText: document.querySelector("#charactersText"),
+  errorsText: document.querySelector("#errorsText"),
   countdown: document.querySelector("#countdown"),
   playerCar: document.querySelector("#playerCar"),
   aiCar: document.querySelector("#aiCar"),
@@ -73,7 +75,7 @@ const elements = {
 const state = {
   playerName: "Jugador",
   duration: 30,
-  aiWpm: 30,
+  aiWpm: 4,
   raceStartedAt: 0,
   elapsedMs: 0,
   playerProgress: 0,
@@ -134,7 +136,7 @@ function resetRace(settings = {}) {
   Object.assign(state, {
     playerName: settings.playerName || "Jugador",
     duration: settings.duration || 30,
-    aiWpm: settings.aiWpm || 30,
+    aiWpm: settings.aiWpm || 4,
     raceStartedAt: 0,
     elapsedMs: 0,
     playerProgress: 0,
@@ -183,6 +185,8 @@ function renderProgress() {
   elements.playerPercent.textContent = `${playerRounded}%`;
   elements.aiPercent.textContent = `${aiRounded}%`;
   elements.wordsText.textContent = `${state.wordsCompleted}/${WORDS_TO_WIN}`;
+  elements.charactersText.textContent = `${state.typedCharacters}`;
+  elements.errorsText.textContent = `${getErrorCount()}`;
   updateCarPosition(elements.playerCar, state.playerProgress);
   updateCarPosition(elements.aiCar, state.aiProgress);
 }
@@ -392,18 +396,24 @@ function determineWinner(reason) {
 
 function calculateMetrics() {
   const elapsedMinutes = Math.max(state.elapsedMs / 60000, 1 / 60000);
-  const ppm = state.typedCharacters / elapsedMinutes;
-  const netWpm = state.wordsCompleted / elapsedMinutes;
+  const keystrokesPerMinute = state.typedCharacters / elapsedMinutes;
+  const wordsPerMinute = state.wordsCompleted / elapsedMinutes;
   const accuracy = state.typedCharacters === 0
     ? 100
     : (state.correctCharacters / state.typedCharacters) * 100;
 
   return {
-    ppm,
-    netWpm,
+    keystrokesPerMinute,
+    wordsPerMinute,
     accuracy,
+    typedCharacters: state.typedCharacters,
+    errors: getErrorCount(),
     wordsCompleted: state.wordsCompleted
   };
+}
+
+function getErrorCount() {
+  return Math.max(0, state.typedCharacters - state.correctCharacters);
 }
 
 function renderResults(winner, metrics) {
@@ -415,9 +425,11 @@ function renderResults(winner, metrics) {
 
   elements.winnerText.textContent = winnerMessages[winner];
   elements.metricsGrid.innerHTML = [
-    ["PPM", `${Math.round(metrics.ppm)}`],
-    ["WPM neto", `${metrics.netWpm.toFixed(1)} WPM`],
+    ["Pulsaciones/min", `${Math.round(metrics.keystrokesPerMinute)}`],
+    ["PPM neto", `${metrics.wordsPerMinute.toFixed(1)} palabras/min`],
     ["Precisión", `${metrics.accuracy.toFixed(1)}%`],
+    ["Caracteres escritos", `${metrics.typedCharacters}`],
+    ["Errores", `${metrics.errors}`],
     ["Palabras correctas", `${metrics.wordsCompleted}`]
   ]
     .map(([label, value]) => `
@@ -432,13 +444,13 @@ function renderResults(winner, metrics) {
 function saveRecord(metrics) {
   const currentRecord = loadRecord();
 
-  if (currentRecord && currentRecord.netWpm >= metrics.netWpm) {
+  if (currentRecord && (currentRecord.wordsPerMinute ?? currentRecord.netWpm) >= metrics.wordsPerMinute) {
     return;
   }
 
   const newRecord = {
     name: state.playerName,
-    netWpm: Number(metrics.netWpm.toFixed(1)),
+    wordsPerMinute: Number(metrics.wordsPerMinute.toFixed(1)),
     date: new Date().toISOString()
   };
 
@@ -456,9 +468,10 @@ function loadRecord() {
 
 function renderRecord() {
   const record = loadRecord();
+  const recordSpeed = record ? record.wordsPerMinute ?? record.netWpm : null;
 
   elements.recordText.textContent = record
-    ? `Récord: ${record.name} - ${record.netWpm} WPM`
+    ? `Récord: ${record.name} - ${recordSpeed} palabras/min`
     : "Récord: todavía no hay marca";
 }
 
