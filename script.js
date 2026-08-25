@@ -83,6 +83,8 @@ const state = {
   wordsCompleted: 0,
   typedCharacters: 0,
   correctCharacters: 0,
+  wordsWithErrors: 0,
+  currentWordHasError: false,
   currentTarget: "",
   wordQueue: [],
   lastWord: "",
@@ -144,6 +146,8 @@ function resetRace(settings = {}) {
     wordsCompleted: 0,
     typedCharacters: 0,
     correctCharacters: 0,
+    wordsWithErrors: 0,
+    currentWordHasError: false,
     currentTarget: "",
     wordQueue: [],
     lastWord: "",
@@ -245,6 +249,8 @@ function countTypedCharacters(inputEvent) {
 
     if (state.currentTarget[typedIndex] === character) {
       state.correctCharacters += 1;
+    } else {
+      state.currentWordHasError = true;
     }
   });
 }
@@ -264,10 +270,15 @@ function handleTyping(event) {
 }
 
 function completeWord() {
+  if (state.currentWordHasError) {
+    state.wordsWithErrors += 1;
+  }
+
   state.wordsCompleted += 1;
   state.playerProgress = Math.min(100, state.wordsCompleted * PLAYER_STEP);
   elements.typingInput.value = "";
   state.currentTarget = getNextWord();
+  state.currentWordHasError = false;
   renderTarget();
   renderProgress();
   focusTypingInput();
@@ -408,6 +419,7 @@ function calculateMetrics() {
     accuracy,
     typedCharacters: state.typedCharacters,
     errors: getErrorCount(),
+    wordsWithErrors: state.wordsWithErrors,
     wordsCompleted: state.wordsCompleted
   };
 }
@@ -430,6 +442,7 @@ function renderResults(winner, metrics) {
     ["Precisión", `${metrics.accuracy.toFixed(1)}%`],
     ["Caracteres escritos", `${metrics.typedCharacters}`],
     ["Errores", `${metrics.errors}`],
+    ["Palabras con error", `${metrics.wordsWithErrors}`],
     ["Palabras correctas", `${metrics.wordsCompleted}`]
   ]
     .map(([label, value]) => `
