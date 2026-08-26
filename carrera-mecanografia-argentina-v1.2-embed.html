@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Carrera de mecanografía argentina: escribí rápido y vencé a la máquina.">
+  <title>Carrera de Mecanografía Argentina</title>
+  <style>
+:root {
+  --bg: #071526;
+  --panel: #0f2740;
+  --panel-soft: #15395d;
+  --text: #f9fafb;
+  --muted: #c9e8fb;
+  --accent: #74cfff;
+  --accent-strong: #35aee8;
+  --danger: #ff4d5e;
+  --warning: #ffd166;
+  --blue: #30a7ff;
+  --road: #30323a;
+  --line: rgba(255, 255, 255, 0.35);
+  --shadow: 0 18px 40px rgba(0, 28, 58, 0.35);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text);
+  background:
+    linear-gradient(180deg, rgba(116, 207, 255, 0.20) 0 31%, rgba(255, 255, 255, 0.18) 31% 38%, rgba(116, 207, 255, 0.20) 38% 69%, transparent 69%),
+    radial-gradient(circle at top left, rgba(255, 209, 102, 0.18), transparent 29rem),
+    linear-gradient(135deg, #061323 0%, #0e3152 52%, #071526 100%);
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.game-shell {
+  width: min(1120px, calc(100% - 24px));
+  margin: 0 auto;
+  padding: 28px 0;
+}
+
+.game-header {
+  margin-bottom: 18px;
+}
+
+.game-header::after {
+  content: "";
+  display: block;
+  width: min(460px, 100%);
+  height: 9px;
+  margin-top: 16px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #74cfff 0 42%, #ffffff 42% 58%, #74cfff 58% 100%);
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: var(--warning);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 8px;
+  font-size: clamp(2.1rem, 8vw, 4.6rem);
+  line-height: 0.95;
+}
+
+h2 {
+  margin-bottom: 8px;
+  font-size: 1.55rem;
+}
+
+.tagline,
+.record,
+.hud-label,
+.game-meta {
+  color: var(--muted);
+}
+
+.game-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+  font-weight: 800;
+}
+
+.game-meta span {
+  padding: 7px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.setup-panel,
+.race-panel,
+.results-panel {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: rgba(15, 39, 64, 0.94);
+  box-shadow: var(--shadow);
+}
+
+.setup-panel,
+.results-panel {
+  padding: 22px;
+}
+
+.panel-heading {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 20px;
+}
+
+.record {
+  margin-bottom: 0;
+  font-weight: 700;
+}
+
+.race-form {
+  display: grid;
+  gap: 18px;
+}
+
+.race-form label,
+legend {
+  color: var(--text);
+  font-weight: 800;
+}
+
+.race-form > input,
+.typing-panel input {
+  width: 100%;
+  border: 2px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  color: var(--text);
+  background: #111620;
+  outline: none;
+}
+
+.race-form > input {
+  padding: 13px 14px;
+}
+
+.race-form > input:focus,
+.typing-panel input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(116, 207, 255, 0.22);
+}
+
+fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+legend {
+  margin-bottom: 10px;
+}
+
+.option-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.option-grid label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 46px;
+  padding: 11px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 8px;
+  background: var(--panel-soft);
+  cursor: pointer;
+}
+
+.option-grid input {
+  accent-color: var(--accent);
+}
+
+.primary-button {
+  min-height: 50px;
+  border: 0;
+  border-radius: 8px;
+  color: #06100a;
+  background: linear-gradient(180deg, #ffffff 0%, var(--accent) 44%, var(--accent-strong) 100%);
+  font-weight: 900;
+  cursor: pointer;
+  transition: transform 140ms ease, filter 140ms ease;
+}
+
+.primary-button:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.primary-button:active {
+  transform: translateY(0);
+}
+
+.race-panel {
+  overflow: hidden;
+}
+
+.race-hud {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px;
+  background: rgba(5, 19, 35, 0.82);
+}
+
+.race-hud > div {
+  display: grid;
+  gap: 2px;
+  min-width: 112px;
+}
+
+.race-hud strong {
+  font-size: 1.45rem;
+}
+
+.track {
+  position: relative;
+  display: grid;
+  gap: 16px;
+  padding: 22px 14px 18px;
+  background:
+    linear-gradient(90deg, transparent 0 calc(100% - 26px), rgba(255, 209, 102, 0.22) calc(100% - 26px) 100%),
+    linear-gradient(180deg, #62c6f2 0%, #f8fbff 48%, #62c6f2 100%);
+}
+
+.finish-line {
+  position: absolute;
+  top: 0;
+  right: 22px;
+  bottom: 0;
+  width: 18px;
+  background:
+    linear-gradient(45deg, #fff 25%, #111 25% 50%, #fff 50% 75%, #111 75%) 0 0 / 18px 18px;
+  opacity: 0.95;
+}
+
+.lane {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 8px;
+}
+
+.driver-label {
+  width: fit-content;
+  max-width: 100%;
+  padding: 4px 9px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.42);
+  font-size: 0.9rem;
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+.road {
+  position: relative;
+  height: 76px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background:
+    linear-gradient(90deg, transparent 0 28px, rgba(255, 255, 255, 0.22) 28px 70px, transparent 70px 112px) center / 112px 4px repeat-x,
+    var(--road);
+  overflow: hidden;
+}
+
+.car {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 58px;
+  height: 32px;
+  transform: translate3d(0, -50%, 0);
+  transition: transform 120ms linear;
+}
+
+.car-body {
+  position: absolute;
+  inset: 6px 0 7px;
+  border-radius: 18px 10px 10px 18px;
+  background: var(--blue);
+  box-shadow: inset 12px 0 rgba(255, 255, 255, 0.42);
+}
+
+.car-body::before {
+  content: "";
+  position: absolute;
+  left: 17px;
+  top: -8px;
+  width: 24px;
+  height: 15px;
+  border-radius: 10px 10px 2px 2px;
+  background: inherit;
+}
+
+.car-player .car-body {
+  background: #74cfff;
+}
+
+.car-ai .car-body {
+  background: #ffffff;
+}
+
+.wheel {
+  position: absolute;
+  bottom: 0;
+  width: 13px;
+  height: 13px;
+  border: 3px solid #0a0b0f;
+  border-radius: 50%;
+  background: #d7dce6;
+}
+
+.wheel-left {
+  left: 9px;
+}
+
+.wheel-right {
+  right: 9px;
+}
+
+.progress-row {
+  display: grid;
+  grid-template-columns: 1fr 48px;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+  font-weight: 800;
+}
+
+progress {
+  width: 100%;
+  height: 12px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+progress::-webkit-progress-bar {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+progress::-webkit-progress-value {
+  background: var(--accent);
+}
+
+progress::-moz-progress-bar {
+  background: var(--accent);
+}
+
+#aiProgress::-webkit-progress-value {
+  background: #ffffff;
+}
+
+#aiProgress::-moz-progress-bar {
+  background: #ffffff;
+}
+
+.typing-panel {
+  display: grid;
+  gap: 12px;
+  padding: 18px 16px 20px;
+  background: rgba(14, 17, 26, 0.62);
+}
+
+.target-word {
+  margin-bottom: 0;
+  color: var(--warning);
+  font-size: clamp(1.65rem, 8vw, 3.35rem);
+  font-weight: 900;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.character-feedback {
+  min-height: 32px;
+  text-align: center;
+  font-size: 1.18rem;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.char-correct {
+  color: var(--accent);
+}
+
+.char-wrong {
+  color: var(--danger);
+  text-decoration: underline;
+}
+
+.char-pending {
+  color: rgba(255, 255, 255, 0.48);
+}
+
+.typing-panel input {
+  padding: 14px;
+  font-size: 1.15rem;
+  text-align: center;
+}
+
+.countdown {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  background: rgba(7, 9, 13, 0.58);
+  color: var(--warning);
+  font-size: clamp(4rem, 18vw, 9rem);
+  font-weight: 900;
+  text-shadow: 0 10px 24px rgba(0, 0, 0, 0.55);
+}
+
+.results-panel {
+  display: grid;
+  gap: 18px;
+}
+
+.winner {
+  margin-bottom: 0;
+  color: var(--warning);
+  font-size: clamp(1.8rem, 8vw, 3rem);
+  font-weight: 900;
+}
+
+.metrics-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.metric {
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.metric span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.metric strong {
+  display: block;
+  margin-top: 3px;
+  font-size: 1.65rem;
+}
+
+.hidden {
+  display: none;
+}
+
+@media (min-width: 720px) {
+  .game-shell {
+    padding: 44px 0;
+  }
+
+  .panel-heading {
+    grid-template-columns: 1fr auto;
+    align-items: end;
+  }
+
+  .option-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  .track {
+    padding: 28px 24px 22px;
+  }
+
+  .race-hud {
+    padding: 18px 24px;
+  }
+
+  .road {
+    height: 92px;
+  }
+
+  .car {
+    width: 72px;
+    height: 40px;
+  }
+
+  .car-body::before {
+    left: 22px;
+    width: 30px;
+  }
+
+  .wheel {
+    width: 15px;
+    height: 15px;
+  }
+
+  .metrics-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}
+
+  </style>
+</head>
+<body>
+  <main class="game-shell">
+    <header class="game-header">
+      <p class="eyebrow">Carrera de mecanografía</p>
+      <h1>Carrera Argentina</h1>
+      <p class="tagline">Acelera con palabras, frases y cultura nacional.</p>
+      <div class="game-meta" aria-label="Información del juego">
+        <span>Creador: Ing. Emanuel Bombina</span>
+        <span>Versión 1.2</span>
+      </div>
+    </header>
+
+    <section class="setup-panel" id="setupPanel" aria-labelledby="setupTitle">
+      <div class="panel-heading">
+        <h2 id="setupTitle">Preparar carrera</h2>
+        <p class="record" id="recordText">Récord: todavía no hay marca</p>
+      </div>
+
+      <form class="race-form" id="raceForm">
+        <label for="playerName">Nombre del jugador</label>
+        <input id="playerName" name="playerName" type="text" autocomplete="name" placeholder="Jugador">
+
+        <fieldset>
+          <legend>Duración</legend>
+          <div class="option-grid">
+            <label><input type="radio" name="duration" value="30" checked> 30s</label>
+            <label><input type="radio" name="duration" value="60"> 60s</label>
+            <label><input type="radio" name="duration" value="90"> 90s</label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Dificultad de la IA</legend>
+          <div class="option-grid">
+            <label><input type="radio" name="difficulty" value="4" checked> Inicial · de 1 a 4 palabras/min</label>
+            <label><input type="radio" name="difficulty" value="15"> Muy Baja · de 5 a 29 palabras/min</label>
+            <label><input type="radio" name="difficulty" value="40"> Baja · entre 30 y 49 palabras/min</label>
+            <label><input type="radio" name="difficulty" value="60"> Media · entre 50 y 69 palabras/min</label>
+            <label><input type="radio" name="difficulty" value="75"> Alta · más de 70 palabras/min</label>
+          </div>
+        </fieldset>
+
+        <button class="primary-button" type="submit">Iniciar Carrera</button>
+      </form>
+    </section>
+
+    <section class="race-panel hidden" id="racePanel" aria-label="Pista de carrera">
+      <div class="race-hud">
+        <div>
+          <span class="hud-label">Tiempo</span>
+          <strong id="timerText">00:00</strong>
+        </div>
+        <div>
+          <span class="hud-label">Palabras</span>
+          <strong id="wordsText">0/20</strong>
+        </div>
+        <div>
+          <span class="hud-label">Caracteres</span>
+          <strong id="charactersText">0</strong>
+        </div>
+        <div>
+          <span class="hud-label">Errores</span>
+          <strong id="errorsText">0</strong>
+        </div>
+      </div>
+
+      <div class="track" id="track">
+        <div class="finish-line" aria-hidden="true"></div>
+        <div class="countdown hidden" id="countdown" aria-live="assertive"></div>
+
+        <div class="lane">
+          <span class="driver-label" id="playerLabel">Jugador</span>
+          <div class="road">
+            <div class="car car-player" id="playerCar" aria-hidden="true">
+              <span class="car-body"></span>
+              <span class="wheel wheel-left"></span>
+              <span class="wheel wheel-right"></span>
+            </div>
+          </div>
+          <div class="progress-row">
+            <progress id="playerProgress" value="0" max="100"></progress>
+            <span id="playerPercent">0%</span>
+          </div>
+        </div>
+
+        <div class="lane">
+          <span class="driver-label">Máquina</span>
+          <div class="road">
+            <div class="car car-ai" id="aiCar" aria-hidden="true">
+              <span class="car-body"></span>
+              <span class="wheel wheel-left"></span>
+              <span class="wheel wheel-right"></span>
+            </div>
+          </div>
+          <div class="progress-row">
+            <progress id="aiProgress" value="0" max="100"></progress>
+            <span id="aiPercent">0%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="typing-panel" id="typingPanel">
+        <p class="target-word" id="targetWord" aria-label="Texto objetivo"></p>
+        <div class="character-feedback" id="characterFeedback" aria-hidden="true"></div>
+        <input id="typingInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="text" aria-label="Escribí el texto objetivo">
+      </div>
+    </section>
+
+    <section class="results-panel hidden" id="resultsPanel" aria-labelledby="resultTitle">
+      <h2 id="resultTitle">Resultado</h2>
+      <p class="winner" id="winnerText"></p>
+      <div class="metrics-grid" id="metricsGrid"></div>
+      <button class="primary-button" id="playAgainButton" type="button">Volver a jugar</button>
+    </section>
+  </main>
+
+  <script>
+const WORD_BANK = [
+  "Santa Fe",
+  "San Martín",
+  "Buenos Aires",
+  "Belgrano",
+  "Messi",
+  "Malvinas Argentinas",
+  "Mate",
+  "Asado",
+  "Córdoba",
+  "Tucumán",
+  "Dulce de Leche",
+  "Chacarera",
+  "Patagonia",
+  "Mendoza",
+  "Jujuy",
+  "Salta",
+  "La Pampa",
+  "Sarmiento",
+  "Eva Perón",
+  "Carlos Gardel",
+  "Manuel Belgrano",
+  "Juana Azurduy",
+  "Río de la Plata",
+  "Aconcagua",
+  "Tierra del Fuego",
+  "Iguazú",
+  "Maradona",
+  "Cataratas del Iguazú",
+  "Casa Rosada",
+  "Obelisco",
+  "Locro",
+  "Empanadas",
+  "Tango",
+  "Fernet",
+  "Gaucho",
+  "Puna",
+  "Rosario",
+  "La Rioja",
+  "San Juan",
+  "Entre Ríos"
+];
+
+const WORDS_TO_WIN = 20;
+const PLAYER_STEP = 100 / WORDS_TO_WIN;
+const RECORD_KEY = "carreraArgentinaRecord";
+
+const elements = {
+  setupPanel: document.querySelector("#setupPanel"),
+  racePanel: document.querySelector("#racePanel"),
+  resultsPanel: document.querySelector("#resultsPanel"),
+  raceForm: document.querySelector("#raceForm"),
+  playerName: document.querySelector("#playerName"),
+  recordText: document.querySelector("#recordText"),
+  playerLabel: document.querySelector("#playerLabel"),
+  timerText: document.querySelector("#timerText"),
+  wordsText: document.querySelector("#wordsText"),
+  charactersText: document.querySelector("#charactersText"),
+  errorsText: document.querySelector("#errorsText"),
+  countdown: document.querySelector("#countdown"),
+  playerCar: document.querySelector("#playerCar"),
+  aiCar: document.querySelector("#aiCar"),
+  playerProgress: document.querySelector("#playerProgress"),
+  aiProgress: document.querySelector("#aiProgress"),
+  playerPercent: document.querySelector("#playerPercent"),
+  aiPercent: document.querySelector("#aiPercent"),
+  targetWord: document.querySelector("#targetWord"),
+  characterFeedback: document.querySelector("#characterFeedback"),
+  typingInput: document.querySelector("#typingInput"),
+  winnerText: document.querySelector("#winnerText"),
+  metricsGrid: document.querySelector("#metricsGrid"),
+  playAgainButton: document.querySelector("#playAgainButton")
+};
+
+const state = {
+  playerName: "Jugador",
+  duration: 30,
+  aiWpm: 4,
+  raceStartedAt: 0,
+  elapsedMs: 0,
+  playerProgress: 0,
+  aiProgress: 0,
+  wordsCompleted: 0,
+  typedCharacters: 0,
+  correctCharacters: 0,
+  wordsWithErrors: 0,
+  currentWordHasError: false,
+  currentTarget: "",
+  wordQueue: [],
+  lastWord: "",
+  animationId: null,
+  isRunning: false
+};
+
+function shuffle(items) {
+  const copy = [...items];
+
+  for (let index = copy.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1));
+    [copy[index], copy[randomIndex]] = [copy[randomIndex], copy[index]];
+  }
+
+  return copy;
+}
+
+function buildWordQueue() {
+  let queue = shuffle(WORD_BANK);
+
+  if (queue[0] === state.lastWord && queue.length > 1) {
+    [queue[0], queue[1]] = [queue[1], queue[0]];
+  }
+
+  state.wordQueue = queue;
+}
+
+function getNextWord() {
+  if (state.wordQueue.length === 0) {
+    buildWordQueue();
+  }
+
+  const nextWord = state.wordQueue.shift();
+  state.lastWord = nextWord;
+  return nextWord;
+}
+
+function readSettings(form) {
+  const formData = new FormData(form);
+  const cleanName = String(formData.get("playerName") || "").trim();
+
+  return {
+    playerName: cleanName || "Jugador",
+    duration: Number(formData.get("duration")),
+    aiWpm: Number(formData.get("difficulty"))
+  };
+}
+
+function resetRace(settings = {}) {
+  Object.assign(state, {
+    playerName: settings.playerName || "Jugador",
+    duration: settings.duration || 30,
+    aiWpm: settings.aiWpm || 4,
+    raceStartedAt: 0,
+    elapsedMs: 0,
+    playerProgress: 0,
+    aiProgress: 0,
+    wordsCompleted: 0,
+    typedCharacters: 0,
+    correctCharacters: 0,
+    wordsWithErrors: 0,
+    currentWordHasError: false,
+    currentTarget: "",
+    wordQueue: [],
+    lastWord: "",
+    animationId: null,
+    isRunning: false
+  });
+
+  buildWordQueue();
+  state.currentTarget = getNextWord();
+}
+
+function showPanel(panelName) {
+  elements.setupPanel.classList.toggle("hidden", panelName !== "setup");
+  elements.racePanel.classList.toggle("hidden", panelName !== "race");
+  elements.resultsPanel.classList.toggle("hidden", panelName !== "results");
+}
+
+function formatTime(seconds) {
+  const safeSeconds = Math.max(0, Math.ceil(seconds));
+  const minutes = Math.floor(safeSeconds / 60);
+  const remainingSeconds = safeSeconds % 60;
+
+  return `${String(minutes).padStart(2, "0")}:${String(remainingSeconds).padStart(2, "0")}`;
+}
+
+function updateCarPosition(car, progress) {
+  const boundedProgress = Math.min(progress, 100);
+  const carWidth = car.offsetWidth || 58;
+  const offset = (boundedProgress / 100) * carWidth;
+  car.style.left = `calc(${boundedProgress}% - ${offset}px)`;
+}
+
+function renderProgress() {
+  const playerRounded = Math.round(state.playerProgress);
+  const aiRounded = Math.round(state.aiProgress);
+
+  elements.playerProgress.value = state.playerProgress;
+  elements.aiProgress.value = state.aiProgress;
+  elements.playerPercent.textContent = `${playerRounded}%`;
+  elements.aiPercent.textContent = `${aiRounded}%`;
+  elements.wordsText.textContent = `${state.wordsCompleted}/${WORDS_TO_WIN}`;
+  elements.charactersText.textContent = `${state.typedCharacters}`;
+  elements.errorsText.textContent = `${getErrorCount()}`;
+  updateCarPosition(elements.playerCar, state.playerProgress);
+  updateCarPosition(elements.aiCar, state.aiProgress);
+}
+
+function renderTarget() {
+  elements.targetWord.textContent = state.currentTarget;
+  renderCharacterFeedback("");
+}
+
+function renderCharacterFeedback(value) {
+  const characters = [...state.currentTarget];
+  const typed = [...value];
+
+  elements.characterFeedback.innerHTML = characters
+    .map((character, index) => {
+      let className = "char-pending";
+
+      if (typed[index] !== undefined) {
+        className = typed[index] === character ? "char-correct" : "char-wrong";
+      }
+
+      return `<span class="${className}">${escapeHtml(character)}</span>`;
+    })
+    .join("");
+}
+
+function escapeHtml(text) {
+  return text
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function focusTypingInput() {
+  if (elements.racePanel.classList.contains("hidden")) {
+    return;
+  }
+
+  elements.typingInput.focus({ preventScroll: true });
+}
+
+function countTypedCharacters(inputEvent) {
+  if (!inputEvent.data) {
+    return;
+  }
+
+  const insertedCharacters = [...inputEvent.data];
+  const selectionStart = elements.typingInput.selectionStart || elements.typingInput.value.length;
+  const startIndex = Math.max(0, selectionStart - insertedCharacters.length);
+
+  insertedCharacters.forEach((character, offset) => {
+    const typedIndex = startIndex + offset;
+    state.typedCharacters += 1;
+
+    if (state.currentTarget[typedIndex] === character) {
+      state.correctCharacters += 1;
+    } else {
+      state.currentWordHasError = true;
+    }
+  });
+}
+
+function handleTyping(event) {
+  if (!state.isRunning) {
+    elements.typingInput.value = "";
+    return;
+  }
+
+  countTypedCharacters(event);
+  renderCharacterFeedback(elements.typingInput.value);
+
+  if (elements.typingInput.value === state.currentTarget) {
+    completeWord();
+  }
+}
+
+function completeWord() {
+  if (state.currentWordHasError) {
+    state.wordsWithErrors += 1;
+  }
+
+  state.wordsCompleted += 1;
+  state.playerProgress = Math.min(100, state.wordsCompleted * PLAYER_STEP);
+  elements.typingInput.value = "";
+  state.currentTarget = getNextWord();
+  state.currentWordHasError = false;
+  renderTarget();
+  renderProgress();
+  focusTypingInput();
+
+  if (state.playerProgress >= 100) {
+    finishRace("player");
+  }
+}
+
+function calculateAiProgress(elapsedMs) {
+  const elapsedMinutes = elapsedMs / 60000;
+  const theoreticalWords = state.aiWpm * elapsedMinutes;
+  return Math.min(100, theoreticalWords * PLAYER_STEP);
+}
+
+function updateRaceFrame(timestamp) {
+  if (!state.isRunning) {
+    return;
+  }
+
+  state.elapsedMs = timestamp - state.raceStartedAt;
+  state.aiProgress = calculateAiProgress(state.elapsedMs);
+  const remainingSeconds = state.duration - state.elapsedMs / 1000;
+
+  elements.timerText.textContent = formatTime(remainingSeconds);
+  renderProgress();
+
+  if (state.aiProgress >= 100) {
+    finishRace("ai");
+    return;
+  }
+
+  if (remainingSeconds <= 0) {
+    finishRace("time");
+    return;
+  }
+
+  state.animationId = requestAnimationFrame(updateRaceFrame);
+}
+
+function startCountdown() {
+  const steps = ["3", "2", "1", "¡Ya!"];
+  let index = 0;
+
+  elements.countdown.classList.remove("hidden");
+  elements.countdown.textContent = steps[index];
+  focusTypingInput();
+
+  const countdownId = window.setInterval(() => {
+    index += 1;
+    elements.countdown.textContent = steps[index] || "";
+    focusTypingInput();
+
+    if (index === steps.length) {
+      window.clearInterval(countdownId);
+      elements.countdown.classList.add("hidden");
+      beginRace();
+    }
+  }, 900);
+}
+
+function beginRace() {
+  state.isRunning = true;
+  state.raceStartedAt = performance.now();
+  elements.typingInput.value = "";
+  elements.typingInput.disabled = false;
+  focusTypingInput();
+  state.animationId = requestAnimationFrame(updateRaceFrame);
+}
+
+function startRace(event) {
+  event.preventDefault();
+  const settings = readSettings(event.currentTarget);
+
+  resetRace(settings);
+  elements.playerLabel.textContent = state.playerName;
+  elements.timerText.textContent = formatTime(state.duration);
+  elements.typingInput.disabled = false;
+  renderTarget();
+  renderProgress();
+  showPanel("race");
+  startCountdown();
+}
+
+function finishRace(reason) {
+  if (!state.isRunning && reason !== "player" && reason !== "ai" && reason !== "time") {
+    return;
+  }
+
+  state.isRunning = false;
+  state.elapsedMs = Math.max(1, performance.now() - state.raceStartedAt);
+  state.aiProgress = calculateAiProgress(state.elapsedMs);
+  elements.typingInput.disabled = true;
+
+  if (state.animationId) {
+    cancelAnimationFrame(state.animationId);
+  }
+
+  renderProgress();
+  const winner = determineWinner(reason);
+  const metrics = calculateMetrics();
+  saveRecord(metrics);
+  renderResults(winner, metrics);
+  showPanel("results");
+}
+
+function determineWinner(reason) {
+  if (reason === "player") {
+    return "player";
+  }
+
+  if (reason === "ai") {
+    return "ai";
+  }
+
+  if (state.playerProgress > state.aiProgress) {
+    return "player";
+  }
+
+  if (state.aiProgress > state.playerProgress) {
+    return "ai";
+  }
+
+  return "tie";
+}
+
+function calculateMetrics() {
+  const elapsedMinutes = Math.max(state.elapsedMs / 60000, 1 / 60000);
+  const keystrokesPerMinute = state.typedCharacters / elapsedMinutes;
+  const wordsPerMinute = state.wordsCompleted / elapsedMinutes;
+  const accuracy = state.typedCharacters === 0
+    ? 100
+    : (state.correctCharacters / state.typedCharacters) * 100;
+
+  return {
+    keystrokesPerMinute,
+    wordsPerMinute,
+    accuracy,
+    typedCharacters: state.typedCharacters,
+    errors: getErrorCount(),
+    wordsWithErrors: state.wordsWithErrors,
+    wordsCompleted: state.wordsCompleted
+  };
+}
+
+function getErrorCount() {
+  return Math.max(0, state.typedCharacters - state.correctCharacters);
+}
+
+function renderResults(winner, metrics) {
+  const winnerMessages = {
+    player: `¡${state.playerName} gana!`,
+    ai: "¡Gana la Máquina!",
+    tie: "¡Empate!"
+  };
+
+  elements.winnerText.textContent = winnerMessages[winner];
+  elements.metricsGrid.innerHTML = [
+    ["Pulsaciones/min", `${Math.round(metrics.keystrokesPerMinute)}`],
+    ["PPM neto", `${metrics.wordsPerMinute.toFixed(1)} palabras/min`],
+    ["Precisión", `${metrics.accuracy.toFixed(1)}%`],
+    ["Caracteres escritos", `${metrics.typedCharacters}`],
+    ["Errores", `${metrics.errors}`],
+    ["Palabras con error", `${metrics.wordsWithErrors}`],
+    ["Palabras correctas", `${metrics.wordsCompleted}`]
+  ]
+    .map(([label, value]) => `
+      <div class="metric">
+        <span>${label}</span>
+        <strong>${value}</strong>
+      </div>
+    `)
+    .join("");
+}
+
+function saveRecord(metrics) {
+  const currentRecord = loadRecord();
+
+  if (currentRecord && (currentRecord.wordsPerMinute ?? currentRecord.netWpm) >= metrics.wordsPerMinute) {
+    return;
+  }
+
+  const newRecord = {
+    name: state.playerName,
+    wordsPerMinute: Number(metrics.wordsPerMinute.toFixed(1)),
+    date: new Date().toISOString()
+  };
+
+  localStorage.setItem(RECORD_KEY, JSON.stringify(newRecord));
+}
+
+function loadRecord() {
+  try {
+    const rawRecord = localStorage.getItem(RECORD_KEY);
+    return rawRecord ? JSON.parse(rawRecord) : null;
+  } catch {
+    return null;
+  }
+}
+
+function renderRecord() {
+  const record = loadRecord();
+  const recordSpeed = record ? record.wordsPerMinute ?? record.netWpm : null;
+
+  elements.recordText.textContent = record
+    ? `Récord: ${record.name} - ${recordSpeed} palabras/min`
+    : "Récord: todavía no hay marca";
+}
+
+function returnToSetup() {
+  resetRace();
+  elements.typingInput.value = "";
+  elements.typingInput.disabled = false;
+  renderRecord();
+  showPanel("setup");
+  elements.playerName.focus();
+}
+
+function keepMobileInputReady() {
+  if (state.isRunning) {
+    focusTypingInput();
+  }
+}
+
+function init() {
+  renderRecord();
+  resetRace();
+  renderProgress();
+  elements.raceForm.addEventListener("submit", startRace);
+  elements.typingInput.addEventListener("input", handleTyping);
+  elements.playAgainButton.addEventListener("click", returnToSetup);
+  document.addEventListener("visibilitychange", keepMobileInputReady);
+  document.addEventListener("pointerdown", keepMobileInputReady);
+}
+
+init();
+
+  </script>
+</body>
+</html>
