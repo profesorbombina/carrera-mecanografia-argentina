@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Carrera de mecanografía argentina: escribí rápido y vencé a la máquina.">
+  <title>Carrera de Mecanografía Argentina</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="game-shell">
+    <header class="game-header">
+      <p class="eyebrow">Carrera de mecanografía</p>
+      <h1>Carrera Argentina</h1>
+      <p class="tagline">Acelera con palabras, frases y cultura nacional.</p>
+      <div class="game-meta" aria-label="Información del juego">
+        <span>Creador: Ing. Emanuel Bombina</span>
+        <span>Versión 1.1</span>
+      </div>
+    </header>
+
+    <section class="setup-panel" id="setupPanel" aria-labelledby="setupTitle">
+      <div class="panel-heading">
+        <h2 id="setupTitle">Preparar carrera</h2>
+        <p class="record" id="recordText">Récord: todavía no hay marca</p>
+      </div>
+
+      <form class="race-form" id="raceForm">
+        <label for="playerName">Nombre del jugador</label>
+        <input id="playerName" name="playerName" type="text" autocomplete="name" placeholder="Jugador">
+
+        <fieldset>
+          <legend>Duración</legend>
+          <div class="option-grid">
+            <label><input type="radio" name="duration" value="30" checked> 30s</label>
+            <label><input type="radio" name="duration" value="60"> 60s</label>
+            <label><input type="radio" name="duration" value="90"> 90s</label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Dificultad de la IA</legend>
+          <div class="option-grid">
+            <label><input type="radio" name="difficulty" value="4" checked> Inicial · de 1 a 4 palabras/min</label>
+            <label><input type="radio" name="difficulty" value="15"> Muy Baja · de 5 a 29 palabras/min</label>
+            <label><input type="radio" name="difficulty" value="40"> Baja · entre 30 y 49 palabras/min</label>
+            <label><input type="radio" name="difficulty" value="60"> Media · entre 50 y 69 palabras/min</label>
+            <label><input type="radio" name="difficulty" value="75"> Alta · más de 70 palabras/min</label>
+          </div>
+        </fieldset>
+
+        <button class="primary-button" type="submit">Iniciar Carrera</button>
+      </form>
+    </section>
+
+    <section class="race-panel hidden" id="racePanel" aria-label="Pista de carrera">
+      <div class="race-hud">
+        <div>
+          <span class="hud-label">Tiempo</span>
+          <strong id="timerText">00:00</strong>
+        </div>
+        <div>
+          <span class="hud-label">Palabras</span>
+          <strong id="wordsText">0/20</strong>
+        </div>
+        <div>
+          <span class="hud-label">Caracteres</span>
+          <strong id="charactersText">0</strong>
+        </div>
+        <div>
+          <span class="hud-label">Errores</span>
+          <strong id="errorsText">0</strong>
+        </div>
+      </div>
+
+      <div class="track" id="track">
+        <div class="finish-line" aria-hidden="true"></div>
+        <div class="countdown hidden" id="countdown" aria-live="assertive"></div>
+
+        <div class="lane">
+          <span class="driver-label" id="playerLabel">Jugador</span>
+          <div class="road">
+            <div class="car car-player" id="playerCar" aria-hidden="true">
+              <span class="car-body"></span>
+              <span class="wheel wheel-left"></span>
+              <span class="wheel wheel-right"></span>
+            </div>
+          </div>
+          <div class="progress-row">
+            <progress id="playerProgress" value="0" max="100"></progress>
+            <span id="playerPercent">0%</span>
+          </div>
+        </div>
+
+        <div class="lane">
+          <span class="driver-label">Máquina</span>
+          <div class="road">
+            <div class="car car-ai" id="aiCar" aria-hidden="true">
+              <span class="car-body"></span>
+              <span class="wheel wheel-left"></span>
+              <span class="wheel wheel-right"></span>
+            </div>
+          </div>
+          <div class="progress-row">
+            <progress id="aiProgress" value="0" max="100"></progress>
+            <span id="aiPercent">0%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="typing-panel" id="typingPanel">
+        <p class="target-word" id="targetWord" aria-label="Texto objetivo"></p>
+        <div class="character-feedback" id="characterFeedback" aria-hidden="true"></div>
+        <input id="typingInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="text" aria-label="Escribí el texto objetivo">
+      </div>
+    </section>
+
+    <section class="results-panel hidden" id="resultsPanel" aria-labelledby="resultTitle">
+      <h2 id="resultTitle">Resultado</h2>
+      <p class="winner" id="winnerText"></p>
+      <div class="metrics-grid" id="metricsGrid"></div>
+      <button class="primary-button" id="playAgainButton" type="button">Volver a jugar</button>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
